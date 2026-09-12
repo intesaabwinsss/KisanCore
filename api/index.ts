@@ -167,22 +167,22 @@ If the user uploads an infected, rotten, moldy, or diseased tomato or vegetable,
         let response;
         try {
           response = await ai.models.generateContent({
-            model: 'gemini-3.5-flash',
+            model: 'gemini-3.8-flash',
             contents: [imagePart, prompt],
             config,
           });
         } catch (firstErr: any) {
-          console.warn('gemini-3.5-flash error, trying gemini-3.5-flash:', firstErr.message);
+          console.warn('gemini-3.8-flash error, trying gemini-3.8-flash:', firstErr.message);
           try {
             response = await ai.models.generateContent({
-              model: 'gemini-3.5-flash',
+              model: 'gemini-3.8-flash',
               contents: [imagePart, prompt],
               config,
             });
           } catch (secErr: any) {
-            console.warn('gemini-3.5-flash error, trying gemini-3.5-flash:', secErr.message);
+            console.warn('gemini-3.8-flash error, trying gemini-3.8-flash:', secErr.message);
             response = await ai.models.generateContent({
-              model: 'gemini-3.5-flash',
+              model: 'gemini-3.8-flash',
               contents: [imagePart, prompt],
               config,
             });
@@ -286,13 +286,13 @@ INSTRUCTIONS FOR PRICING & MARKET ADVISORY:
         let response;
         try {
           response = await ai.models.generateContent({
-            model: 'gemini-3.5-flash',
+            model: 'gemini-3.8-flash',
             contents: prompt,
             config,
           });
         } catch (firstErr) {
           response = await ai.models.generateContent({
-            model: 'gemini-3.5-flash',
+            model: 'gemini-3.8-flash',
             contents: prompt,
             config,
           });
@@ -923,7 +923,7 @@ Include estimated arrivals (MT), projected Mandi price range (INR/kg), KisanMand
 }`;
 
         const response = await ai.models.generateContent({
-          model: 'gemini-3.5-flash',
+          model: 'gemini-3.8-flash',
           contents: prompt,
           config: {
             responseMimeType: 'application/json',
@@ -999,7 +999,7 @@ Format with clean Markdown, bold figures, and clear bullet points.`;
         let response;
         try {
           response = await ai.models.generateContent({
-            model: 'gemini-3.5-flash',
+            model: 'gemini-3.8-flash',
             contents: prompt,
             config: {
               tools: [{ googleSearch: {} }],
@@ -1008,7 +1008,7 @@ Format with clean Markdown, bold figures, and clear bullet points.`;
           });
         } catch (firstErr) {
           response = await ai.models.generateContent({
-            model: 'gemini-3.5-flash',
+            model: 'gemini-3.8-flash',
             contents: prompt,
             config: {
               tools: [{ googleSearch: {} }],
@@ -1345,7 +1345,7 @@ Be helpful, concise, and empathetic.`;
     };
 
     let response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.8-flash',
       contents: formattedMessages,
       config: {
         systemInstruction,
@@ -1396,7 +1396,7 @@ Be helpful, concise, and empathetic.`;
 
       // Call Gemini again with the function responses
       response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: 'gemini-3.8-flash',
         contents: formattedMessages,
         config: {
           systemInstruction,

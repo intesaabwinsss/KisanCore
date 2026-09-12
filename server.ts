@@ -68,6 +68,7 @@ app.post('/api/gemini/quality-grade', async (req, res) => {
     else if (detectedMime.includes('webp')) detectedMime = 'image/webp';
     else detectedMime = 'image/jpeg';
 
+    let lastGeminiError = '';
     if (ai && cleanBase64 && cleanBase64.length > 50) {
       try {
         const prompt = `You are a certified Indian AGMARK, APMC Mandi, and Export Agricultural Produce Quality Inspector, Senior Plant Pathologist, and Post-Harvest Technologist.
@@ -168,23 +169,23 @@ If the user uploads an infected, rotten, moldy, or diseased tomato or vegetable,
         let response;
         try {
           response = await ai.models.generateContent({
-            model: 'gemini-3.5-flash',
-            contents: [imagePart, prompt],
+            model: 'gemini-3.8-flash',
+            contents: { parts: [imagePart, { text: prompt }] },
             config,
           });
         } catch (firstErr: any) {
-          console.warn('gemini-3.5-flash error, trying gemini-3.5-flash:', firstErr.message);
+          console.warn('gemini-3.8-flash error, trying gemini-3.8-flash:', firstErr.message);
           try {
             response = await ai.models.generateContent({
-              model: 'gemini-3.5-flash',
-              contents: [imagePart, prompt],
+              model: 'gemini-3.8-flash',
+              contents: { parts: [imagePart, { text: prompt }] },
               config,
             });
           } catch (secErr: any) {
-            console.warn('gemini-3.5-flash error, trying gemini-3.5-flash:', secErr.message);
+            console.warn('gemini-3.8-flash error, trying gemini-3.8-flash:', secErr.message);
             response = await ai.models.generateContent({
-              model: 'gemini-3.5-flash',
-              contents: [imagePart, prompt],
+              model: 'gemini-3.8-flash',
+              contents: { parts: [imagePart, { text: prompt }] },
               config,
             });
           }
@@ -199,6 +200,7 @@ If the user uploads an infected, rotten, moldy, or diseased tomato or vegetable,
         }
       } catch (geminiErr: any) {
         console.error('Gemini Quality Grade Vision API execution error:', geminiErr);
+        lastGeminiError = geminiErr.message; 
       }
     }
 
@@ -234,7 +236,7 @@ If the user uploads an infected, rotten, moldy, or diseased tomato or vegetable,
         diseaseDetected: 'Suspected fungal/bacterial leaf and fruit blemish',
         isDiseasedOrInfected: matched.score < 75,
         quarantineAction: 'Sort out affected pieces immediately to protect rest of harvest.',
-        inspectorNotes: matched.notes,
+        inspectorNotes: matched.notes + (lastGeminiError ? ' | ERROR: ' + lastGeminiError : ''),
         suitableForExport: false,
         coldChainRequired: true,
       },
@@ -287,13 +289,13 @@ INSTRUCTIONS FOR PRICING & MARKET ADVISORY:
         let response;
         try {
           response = await ai.models.generateContent({
-            model: 'gemini-3.5-flash',
+            model: 'gemini-3.8-flash',
             contents: prompt,
             config,
           });
         } catch (firstErr) {
           response = await ai.models.generateContent({
-            model: 'gemini-3.5-flash',
+            model: 'gemini-3.8-flash',
             contents: prompt,
             config,
           });
@@ -924,7 +926,7 @@ Include estimated arrivals (MT), projected Mandi price range (INR/kg), KisanMand
 }`;
 
         const response = await ai.models.generateContent({
-          model: 'gemini-3.5-flash',
+          model: 'gemini-3.8-flash',
           contents: prompt,
           config: {
             responseMimeType: 'application/json',
@@ -1000,7 +1002,7 @@ Format with clean Markdown, bold figures, and clear bullet points.`;
         let response;
         try {
           response = await ai.models.generateContent({
-            model: 'gemini-3.5-flash',
+            model: 'gemini-3.8-flash',
             contents: prompt,
             config: {
               tools: [{ googleSearch: {} }],
@@ -1009,7 +1011,7 @@ Format with clean Markdown, bold figures, and clear bullet points.`;
           });
         } catch (firstErr) {
           response = await ai.models.generateContent({
-            model: 'gemini-3.5-flash',
+            model: 'gemini-3.8-flash',
             contents: prompt,
             config: {
               tools: [{ googleSearch: {} }],
@@ -1346,7 +1348,7 @@ Be helpful, concise, and empathetic.`;
     };
 
     let response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.8-flash',
       contents: formattedMessages,
       config: {
         systemInstruction,
@@ -1397,7 +1399,7 @@ Be helpful, concise, and empathetic.`;
 
       // Call Gemini again with the function responses
       response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: 'gemini-3.8-flash',
         contents: formattedMessages,
         config: {
           systemInstruction,
